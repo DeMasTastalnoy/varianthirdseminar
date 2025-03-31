@@ -11,6 +11,8 @@ const User = require("./models/userModel");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const authenticateUser = require("./middleware/authMiddleware");
+const pathRouter = require("./routes/pathRoutes");
+const reviewRouter = require("./routes/reviewRoutes");
 
 
 
@@ -47,6 +49,8 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/routes", pathRouter);
+app.use("/api/reviews", reviewRouter);
 
 app.get("/register", (req, res) => res.render("./layouts/register"));
 app.get("/login", (req, res) => res.render("./layouts/login"));

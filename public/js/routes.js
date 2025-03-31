@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 routesList.innerHTML = '';  // Очищаем список
                 data.forEach(route => {
                     const routeElement = document.createElement("div");
+                    routeElement.classList.add("route-card");
                     routeElement.innerHTML = `
                         <h3>${route.name}</h3>
                         <p>${route.description}</p>
@@ -22,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
     }
+
 
     // Показать форму для добавления маршрута
     addRouteBtn.addEventListener("click", () => {

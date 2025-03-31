@@ -20,6 +20,9 @@
 //         map.geoObjects.add(route);
 //     });
 // });
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
     ymaps.ready(function () {
         const map = new ymaps.Map("map", {
@@ -36,6 +39,37 @@ document.addEventListener("DOMContentLoaded", () => {
             balloonContent: "Санкт-Петербург"
         });
         map.geoObjects.add(marker2);
+
+        async function loadRoutes() {
+            try {
+                const response = await fetch("/api/routes");
+                const routes = await response.json();
+
+                routes.forEach(route => {
+                    let coords = route.coordinates;
+                    if (typeof coords === "string") {
+                        coords = JSON.parse(coords); // Если координаты хранятся строкой, парсим в массив
+                    }
+
+                    if (Array.isArray(coords)) {
+                        coords.forEach(([lat, lng]) => {
+                            const placemark = new ymaps.Placemark([lat, lng], {
+                                balloonContentHeader: `<b>${route.name}</b>`,
+                                balloonContentBody: `<p>${route.description}</p>`,
+                            }, {
+                                preset: "islands#redDotIcon"
+                            });
+
+                            map.geoObjects.add(placemark);
+                        });
+                    }
+                });
+            } catch (err) {
+                console.error("Ошибка загрузки маршрутов:", err);
+            }
+        }
+
+        loadRoutes();
         // map.events.add("click", function (e) {
         //     const coords = e.get("coords"); // Получаем координаты клика
         //     const marker = new ymaps.Placemark(coords, {

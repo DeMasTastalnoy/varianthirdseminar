@@ -2,10 +2,11 @@ const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
 
 const User = {
-    create: async (name, email, password, region, town) => {
+    create: async (name, email, password) => {
+        const hashedPassword = await bcrypt.hash(password, 10);
         const { rows } = await pool.query(
             "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email",
-            [name, email, password]
+            [name, email, hashedPassword]
         );
         return rows[0];
     },

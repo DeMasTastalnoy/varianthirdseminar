@@ -13,7 +13,7 @@ const cookieParser = require("cookie-parser");
 const authenticateUser = require("./middleware/authMiddleware");
 const pathRouter = require("./routes/pathRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
-
+const bodyParser = require('body-parser');
 
 
 require("dotenv").config();
@@ -35,6 +35,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json()); // для обработки JSON-тел запросов
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(bodyParser.json());
 app.use((req, res, next) => {
     const token = req.cookies.token;
     if (token) {
@@ -71,6 +72,60 @@ app.get("/profile", authenticateUser,(req, res) => {
         res.status(500).send("Ошибка сервера");
     }
 });
+
+let routes = [
+    { id: 1, name: "Маршрут по Москве", description: "Прогулка по историческим местам Москвы", coordinates: [55.751244, 37.618423], reviews: [] },
+    { id: 2, name: "Маршрут по Санкт-Петербургу", description: "Экскурсия по Санкт-Петербургу", coordinates: [59.9342802, 30.3350986], reviews: [] },
+];
+
+// Получение всех маршрутов
+app.get('/api/routes', (req, res) => {
+    res.json(routes);
+});
+
+// Получение одного маршрута по ID
+app.get('/api/routes/:id', (req, res) => {
+    const route = routes.find(r => r.id === parseInt(req.params.id));
+    res.json(route);
+});
+
+// Добавление нового маршрута
+// app.post('/api/routes', (req, res) => {
+//     const newRoute = req.body;
+//     newRoute.id = routes.length + 1;  // Генерация ID
+//     newRoute.reviews = [];
+//     routes.push(newRoute);
+//     res.json(newRoute);
+// });
+
+app.post('/api/routes', (req, res) => {
+    const { name, description, coordinates } = req.body;
+
+    if (!name || !coordinates || !Array.isArray(coordinates) || !coordinates.length) {
+        return res.status(400).json({ error: "Некорректные данные" });
+    }
+
+    const newRoute = {
+        id: routes.length + 1,
+        name,
+        description,
+        coordinates,
+        reviews: []
+    };
+
+    routes.push(newRoute);
+    res.json(newRoute);
+});
+
+// Добавление отзыва для маршрута
+app.post('/api/routes/:id/reviews', (req, res) => {
+    const route = routes.find(r => r.id === parseInt(req.params.id));
+    const newReview = req.body;
+    route.reviews.push(newReview);
+    res.json(route);
+});
+
+app.get("/home", (req, res) => res.render("./layouts/home"));
 
 const port = 3000;
 

@@ -1,0 +1,30 @@
+<head>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=447a21a3-0003-4563-87b1-76f9740d806b&lang=ru_RU" type="text/javascript"></script>
+</head>
+
+
+<div id="map" style="width: 100%; height: 500px;"></div>
+
+
+<h1>Маршруты</h1>
+<div id="routesList">
+
+</div>
+<button id="addRouteBtn">Добавить маршрут</button>
+
+<div id="routeForm" style="display:none;">
+    <h2>Добавить маршрут</h2>
+    <form id="newRouteForm">
+        <label for="routeName">Название маршрута:</label>
+        <input type="text" id="routeName" required><br>
+        <label for="routeDescription">Описание:</label>
+        <textarea id="routeDescription" required></textarea><br>
+        <label for="routeCoordinates">Координаты (например, "55.751244, 37.618423"): </label>
+        <input type="text" id="routeCoordinates" required><br>
+        <button type="submit">Добавить маршрут</button>
+    </form>
+</div>
+
+
+<script src="/js/routes.js"></script>
+<script src="/js/map.js"></script>

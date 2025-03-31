@@ -4,15 +4,33 @@ const pool = require("../config/db");
 const authenticateUser = require("../middleware/authMiddleware");
 
 // ✅ Создание маршрута
+// router.post("/", authenticateUser, async (req, res) => {
+//     const { name, description } = req.body;
+//     try {
+//         const result = await pool.query(
+//             "INSERT INTO routes (user_id, name, description) VALUES ($1, $2, $3) RETURNING *",
+//             [req.user.id, name, description]
+//         );
+//         res.json(result.rows[0]);
+//     } catch (err) {
+//         res.status(500).json({ error: "Ошибка при создании маршрута" });
+//     }
+// });
 router.post("/", authenticateUser, async (req, res) => {
-    const { name, description } = req.body;
+    const { name, description, coordinates } = req.body;
+
+    if (!coordinates || !Array.isArray(coordinates) || !coordinates.length) {
+        return res.status(400).json({ error: "Некорректные координаты" });
+    }
+
     try {
         const result = await pool.query(
-            "INSERT INTO routes (user_id, name, description) VALUES ($1, $2, $3) RETURNING *",
-            [req.user.id, name, description]
+            "INSERT INTO routes (user_id, name, description, coordinates) VALUES ($1, $2, $3, $4) RETURNING *",
+            [req.user.id, name, description, JSON.stringify(coordinates)]
         );
         res.json(result.rows[0]);
     } catch (err) {
+        console.error("Ошибка при создании маршрута:", err);
         res.status(500).json({ error: "Ошибка при создании маршрута" });
     }
 });

@@ -1,6 +1,9 @@
 <head>
     <script src="https://api-maps.yandex.ru/2.1/?apikey=447a21a3-0003-4563-87b1-76f9740d806b&lang=ru_RU" type="text/javascript"></script>
 
+
+
+
     <style>
         #routesList {
             display: flex;
@@ -10,7 +13,7 @@
         }
 
         .route-card {
-            width: calc(33.33% - 15px);
+            width: calc(33.33% - 45px);
             min-width: 250px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -28,6 +31,8 @@
 <div id="routesList">
 
 </div>
+
+<div  id="routeCreation" style="display:none;">
 <button id="addRouteBtn">Добавить маршрут</button>
 
 <div id="routeForm" style="display:none;">
@@ -37,12 +42,25 @@
         <input type="text" id="routeName" required><br>
         <label for="routeDescription">Описание:</label>
         <textarea id="routeDescription" required></textarea><br>
-        <label for="routeCoordinates">Координаты (например, "55.751244, 37.618423"): </label>
+        <label for="routeCoordinates">Координаты (например, "55.751244; 37.618423"): </label>
         <input type="text" id="routeCoordinates" required><br>
         <button type="submit">Добавить маршрут</button>
     </form>
 </div>
-
+</div>
 
 <script src="/js/routes.js"></script>
 <script src="/js/map.js"></script>
+<script>
+    window.userRole = "{{user.role}}" // замените на "admin", чтобы протестировать
+
+document.addEventListener("DOMContentLoaded", function () {
+    const routeCreation = document.getElementById("routeCreation");
+
+
+    // Проверяем, является ли пользователь администратором
+    if (window.userRole === "admin") {
+        routeCreation.style.display = "block";
+    }
+});
+</script>

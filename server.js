@@ -89,14 +89,6 @@ app.get('/api/routes/:id', (req, res) => {
     res.json(route);
 });
 
-// Добавление нового маршрута
-// app.post('/api/routes', (req, res) => {
-//     const newRoute = req.body;
-//     newRoute.id = routes.length + 1;  // Генерация ID
-//     newRoute.reviews = [];
-//     routes.push(newRoute);
-//     res.json(newRoute);
-// });
 
 app.post('/api/routes', (req, res) => {
     const { name, description, coordinates } = req.body;
@@ -125,7 +117,24 @@ app.post('/api/routes/:id/reviews', (req, res) => {
     res.json(route);
 });
 
-app.get("/home", (req, res) => res.render("./layouts/home"));
+// app.get("/home", (req, res) => res.render("./layouts/home"));
+
+app.get("/home", (req, res) => {
+    try {
+        console.log("Запрос на /home получен");
+        if (!req.user) {
+            return res.redirect("/login"); // Если нет токена, перенаправляем
+        }
+        const user = req.user || {name: "Гость", email: "guest@example.com"};
+        const userId = req.user.id; // Получаем ID авторизованного пользователя
+        console.log(user);
+
+        res.render("./layouts/home", {user});
+    }catch (error) {
+        console.error("Ошибка при получении данных пользователя:", error);
+        res.status(500).send("Ошибка сервера");
+    }
+});
 
 const port = 3000;
 

@@ -14,6 +14,7 @@ const authenticateUser = require("./middleware/authMiddleware");
 const pathRouter = require("./routes/pathRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
 const bodyParser = require('body-parser');
+const pool = require("./config/db");
 
 
 require("dotenv").config();
@@ -53,6 +54,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/routes", pathRouter);
 app.use("/api/reviews", reviewRouter);
 
+
 app.get("/register", (req, res) => res.render("./layouts/register"));
 app.get("/login", (req, res) => res.render("./layouts/login"));
 
@@ -89,6 +91,16 @@ app.get('/api/routes/:id', (req, res) => {
     res.json(route);
 });
 
+// app.get("/api/routes/:routeId", async (req, res) => {
+//     const route = await getRouteFromDB(req.params.routeId);
+//
+//     if (!route) {
+//         return res.status(404).json({ error: "Маршрут не найден" });
+//     }
+//
+//     res.json(route);
+// });
+
 
 app.post('/api/routes', (req, res) => {
     const { name, description, coordinates } = req.body;
@@ -115,6 +127,22 @@ app.post('/api/routes/:id/reviews', (req, res) => {
     const newReview = req.body;
     route.reviews.push(newReview);
     res.json(route);
+});
+
+app.post("/add-review", authenticateUser, async (req, res) => {
+    const { routeId, reviewText } = req.body;
+    const userId = req.user.id;
+
+    try {
+        await pool.query(
+            "INSERT INTO reviews (user_id, route_id, comment) VALUES ($1, $2, $3)",
+            [userId, routeId, reviewText]
+        );
+        res.json({ message: "Отзыв добавлен" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Ошибка сервера" });
+    }
 });
 
 // app.get("/home", (req, res) => res.render("./layouts/home"));

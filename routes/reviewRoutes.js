@@ -21,7 +21,8 @@ router.post("/", authenticateUser, async (req, res) => {
 router.get("/:route_id", async (req, res) => {
     const { route_id } = req.params;
     try {
-        const result = await pool.query("SELECT * FROM reviews WHERE route_id = $1", [route_id]);
+        const result = await pool.query("SELECT reviews.comment, users.name FROM reviews JOIN users ON reviews.user_id = users.id WHERE route_id = $1",[route_id]);
+        // const result = await pool.query("SELECT * FROM reviews WHERE route_id = $1", [route_id]);
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: "Ошибка при получении отзывов" });

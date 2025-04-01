@@ -4,44 +4,89 @@ document.addEventListener("DOMContentLoaded", () => {
     const routeForm = document.getElementById("routeForm");
     const newRouteForm = document.getElementById("newRouteForm");
 
-    // Функция для отображения маршрутов
     function displayRoutes() {
-        fetch("/api/routes")  // Получаем список маршрутов с сервера
+        fetch("/api/routes")
             .then(response => response.json())
             .then(data => {
-                routesList.innerHTML = '';  // Очищаем список
+                routesList.innerHTML = '';
                 data.forEach(route => {
                     const routeElement = document.createElement("div");
                     routeElement.classList.add("route-card");
                     routeElement.innerHTML = `
                         <h3>${route.name}</h3>
                         <p>${route.description}</p>
-                        <p>Координаты: ${route.coordinates}</p>
+                        <p style="display:none;">Координаты: ${route.coordinates}</p>
+                        <button class="review-btn" data-route-id="${route.id}">Оставить отзыв</button>
                         <button class="viewReviewsBtn" data-route-id="${route.id}">Просмотр отзывов</button>
                     `;
                     routesList.appendChild(routeElement);
                 });
-            });
-    }
+
+                document.getElementById("cancelReviewBtn").addEventListener("click", function () {
+                    document.getElementById("reviewForm").style.display = "none";
+                });
+
+                function openReviewForm(routeId) {
+                    document.getElementById("routeId").value = routeId;
+                    document.getElementById("reviewForm").style.display = "block";
+                }
+                // Вешаем обработчики на кнопки "Оставить отзыв"
+                document.querySelectorAll(".review-btn").forEach(button => {
+                    button.addEventListener("click", function () {
+                        const routeId = this.getAttribute("data-route-id");
+                        openReviewForm(routeId);
+                    });
+                });
+                document.querySelectorAll(".viewReviewsBtn").forEach(button => {
+                    button.addEventListener("click", function () {
+                        console.log("Получаем отзывы")
+                        const routeId = this.getAttribute("data-route-id");
+                        const reviewList = document.getElementById("reviewList");
+
+                        fetch(`/api/reviews/${routeId}`)
+                            .then(response => response.json())
+                            .then(reviews => {
+                                reviewList.innerHTML = ""; // Очищаем список
+                                if (reviews.length === 0) {
+                                    reviewList.innerHTML = "<p>Отзывов пока нет.</p>";
+                                } else {
+                                    reviews.forEach(review => {
+                                        const reviewElement = document.createElement("div");
+                                        reviewElement.innerHTML = `
+                                    <p>${review.comment}</p>
+                                    <p><strong>Автор:</strong> ${review.name}</p>
+                                `;
+                                        reviewList.appendChild(reviewElement);
+                                    });
+                                }
+                                reviewList.style.display = "block"; // Показываем блок с отзывами
+                            })
+                            .catch(error => console.error("Ошибка загрузки отзывов:", error));
+                    });
+                });
+
+            })
+            .catch(error => console.error("Ошибка загрузки маршрутов:", error));
 
 
-    // Показать форму для добавления маршрута
+            }
+
+    displayRoutes();
+
     addRouteBtn.addEventListener("click", () => {
         routeForm.style.display = 'block';
     });
 
-    // Добавление нового маршрута
     newRouteForm.addEventListener("submit", (e) => {
         e.preventDefault();
         const name = document.getElementById("routeName").value;
         const description = document.getElementById("routeDescription").value;
-        // const coordinates = document.getElementById("routeCoordinates").value.split(",").map(coord => parseFloat(coord.trim()));
         const coordinates = document.getElementById("routeCoordinates").value
-            .split(";") // Разделяем точки по ";"
+            .split(";")
             .map(pair => pair.split(",").map(coord => parseFloat(coord.trim())));
 
         const newRoute = { name, description, coordinates };
-        console.log(newRoute);
+
         fetch("/api/routes", {
             method: "POST",
             headers: {
@@ -50,12 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
             body: JSON.stringify(newRoute),
         })
             .then(response => response.json())
-            .then(data => {
+            .then(() => {
                 routeForm.style.display = 'none';
-                displayRoutes();  // Обновляем список маршрутов
+                displayRoutes();
             });
     });
-
-    // Загрузка маршрутов при старте
-    displayRoutes();
 });
+
+

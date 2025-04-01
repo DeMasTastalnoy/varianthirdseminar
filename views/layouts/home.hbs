@@ -30,6 +30,23 @@
 <h1>Маршруты</h1>
 <div id="routesList">
 
+
+</div>
+
+<div id="reviewForm" style="display: none;">
+    <h2>Оставить отзыв</h2>
+    <form id="newReviewForm">
+        <input type="hidden" id="routeId">
+        <label for="reviewText">Ваш отзыв:</label>
+        <textarea id="reviewText" required></textarea><br>
+        <button type="submit">Отправить</button>
+        <button type="button" id="cancelReviewBtn">Отмена</button>
+    </form>
+</div>
+
+<div id="reviewList" style="display: none;">
+
+
 </div>
 
 <div  id="routeCreation" style="display:none;">
@@ -51,6 +68,7 @@
 
 <script src="/js/routes.js"></script>
 <script src="/js/map.js"></script>
+<script src="/js/reviews.js"></script>
 <script>
     window.userRole = "{{user.role}}" // замените на "admin", чтобы протестировать
 

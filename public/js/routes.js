@@ -48,10 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             .then(reviews => {
                                 reviewList.innerHTML = ""; // Очищаем список
                                 if (reviews.length === 0) {
-                                    reviewList.innerHTML = "<p>Отзывов пока нет.</p>";
+                                    reviewList.innerHTML = "<h2 class='review-header'>Отзывы о маршруте</h2><p>Отзывов пока нет.</p>";
                                 } else {
+                                    reviewList.innerHTML = "<h2 class='review-header'>Отзывы о маршруте</h2>";
                                     reviews.forEach(review => {
                                         const reviewElement = document.createElement("div");
+                                        reviewElement.classList.add("review-card");
                                         reviewElement.innerHTML = `
                                     <p>${review.comment}</p>
                                     <p><strong>Автор:</strong> ${review.name}</p>
@@ -59,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                         reviewList.appendChild(reviewElement);
                                     });
                                 }
-                                reviewList.style.display = "block"; // Показываем блок с отзывами
+                                reviewList.style.display = "flex"; // Показываем блок с отзывами
                             })
                             .catch(error => console.error("Ошибка загрузки отзывов:", error));
                     });

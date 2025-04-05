@@ -14,6 +14,7 @@ const authenticateUser = require("./middleware/authMiddleware");
 const pathRouter = require("./routes/pathRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
 const bodyParser = require('body-parser');
+const friendRoutes = require("./routes/friendRoutes");
 const pool = require("./config/db");
 
 
@@ -53,6 +54,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/routes", pathRouter);
 app.use("/api/reviews", reviewRouter);
+app.use("/api/friends", friendRoutes);
 
 
 app.get("/register", (req, res) => res.render("./layouts/register"));
@@ -69,6 +71,23 @@ app.get("/profile", authenticateUser,(req, res) => {
         console.log(user);
 
         res.render("./layouts/profile", {user});
+    }catch (error) {
+        console.error("Ошибка при получении данных пользователя:", error);
+        res.status(500).send("Ошибка сервера");
+    }
+});
+
+app.get("/friends", authenticateUser,(req, res) => {
+    try {
+        console.log("Запрос на /friends получен");
+        if (!req.user) {
+            return res.redirect("/login"); // Если нет токена, перенаправляем
+        }
+        const user = req.user || {name: "Гость", email: "guest@example.com"};
+        const userId = req.user.id; // Получаем ID авторизованного пользователя
+        console.log(user);
+
+        res.render("./layouts/friends", {user});
     }catch (error) {
         console.error("Ошибка при получении данных пользователя:", error);
         res.status(500).send("Ошибка сервера");

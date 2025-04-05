@@ -1,0 +1,19 @@
+<h1>Ваши друзья, {{user.name}}</h1> <button id="addFriendBtn">Добавить друзей</button>
+
+<div id="addFriendSection" style="display: none; margin-top: 1em;">
+    <input type="text" id="friendSearchInput" placeholder="Введите имя друга">
+    <div id="friendSearchResults"></div>
+</div>
+
+<div id="friendsList">
+
+</div>
+
+<p id="noFriendsMessage" style="display: none;">У вас пока нет друзей</p>
+
+
+<script>
+    const userId = {{user.id}};
+</script>
+
+<script src="/js/friends.js"></script>

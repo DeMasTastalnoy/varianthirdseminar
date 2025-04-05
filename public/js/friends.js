@@ -32,16 +32,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (!groupedFriends[id]) {
                         groupedFriends[id] = { name, routes: [] };
                     }
-                    groupedFriends[id].routes.push({ id: route_id, name: route_name });
+                    if (route_id && route_name) {
+                        groupedFriends[id].routes.push({ id: route_id, name: route_name });
+                    }
                 });
 
                 Object.entries(groupedFriends).forEach(([id, friend]) => {
                     const friendDiv = document.createElement("div");
+                    friendDiv.classList.add("friend-card");
 
                     const routesHtml = friend.routes.length > 0
                         ? `<ul>
             ${friend.routes.map(route =>
-                            `<li>${route.name} <button onclick="viewRoute(${route.id})">Просмотр</button></li>`
+                            `<li>${route.name} <button onclick="viewRoute(${route.id} style='margin-left:4px;')">Просмотр</button></li>`
                         ).join("")}
            </ul>`
                         : `<p>У пользователя нет избранных маршрутов</p>`;
@@ -52,10 +55,10 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
                     friendDiv.innerHTML = `
-                        <h3>${friend.name}</h3>
+                        <h3 style='padding-left:4px; border:2px solid black; margin:0;' >${friend.name}</h3>
                         <ul>
                             ${friend.routes.map(route =>
-                        `<li>${route.name} <button onclick="viewRoute(${route.id})">Просмотр</button></li>`
+                        `<li>${route.name} <button onclick="viewRoute(${route.id} style='margin-left:4px;)">Просмотр</button></li>`
                     ).join("")}
                         </ul>
                     `;

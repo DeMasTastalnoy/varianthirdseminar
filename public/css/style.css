@@ -20,3 +20,19 @@ nav{
 .navbar .navbar:hover .navbar:active {
     color:black;
 }
+
+#friendsList{
+    border: 1px solid black;
+    background: rgb(155, 181, 181, 0.35);
+    display: grid;
+    margin-top: 15px;
+}
+
+.friend-card{
+    border: 2px solid black;
+    background: white;
+    margin: 5px 5px 5px 5px;
+    width: 250px;
+    height: auto;
+    min-height: 150px;
+}

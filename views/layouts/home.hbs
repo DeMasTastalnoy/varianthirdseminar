@@ -52,6 +52,35 @@
             color: white;
             padding: 5px 5px;
         }
+
+        .star {
+            font-size: 2rem;
+            cursor: pointer;
+            color: gray;
+            transition: color 0.2s;
+        }
+
+        .star.hover,
+        .star.selected {
+            color: gold;
+        }
+
+        .average-rating {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid black;
+            background: white;
+        }
+
+        .rating-number {
+            font-size: 1.2rem;
+            color: #444;
+        }
+
+
     </style>
 </head>
 
@@ -69,6 +98,15 @@
     <h2>Оставить отзыв</h2>
     <form id="newReviewForm">
         <input type="hidden" id="routeId">
+        <label>Оценка:</label>
+        <div id="ratingStars">
+            <span class="star" data-value="1">☆</span>
+            <span class="star" data-value="2">☆</span>
+            <span class="star" data-value="3">☆</span>
+            <span class="star" data-value="4">☆</span>
+            <span class="star" data-value="5">☆</span>
+        </div>
+        <input type="hidden" id="reviewRating" required>
         <label for="reviewText">Ваш отзыв:</label>
         <textarea id="reviewText" required></textarea><br>
         <button type="submit">Отправить</button>
@@ -91,7 +129,7 @@
         <input type="text" id="routeName" required><br>
         <label for="routeDescription">Описание:</label>
         <textarea id="routeDescription" required></textarea><br>
-        <label for="routeCoordinates">Координаты (например, "55.751244; 37.618423"): </label>
+        <label for="routeCoordinates">Координаты (например, 55.751244, 37.618423) для одной точки, координаты для двух точек (например, 56.751244, 37.618423; 57.751244, 38.618423) </label>
         <input type="text" id="routeCoordinates" required><br>
         <button type="submit">Добавить маршрут</button>
     </form>

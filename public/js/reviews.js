@@ -35,36 +35,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Добавление нового отзыва
-    newReviewForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const content = document.getElementById("reviewContent").value;
 
-        const newReview = { content, author: "Пользователь" }; // Можно добавить авторизацию
 
-        fetch(`/api/routes/${routeId}/reviews`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newReview)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
-                }
-                return response.text(); // Получаем текст ответа
-            })
-            .then(text => {
-                if (!text) {
-                    throw new Error("Ответ сервера пуст!");
-                }
-                return JSON.parse(text); // Парсим JSON вручную
-            })
-            .then(data => {
-                routeName.textContent = data.name;
-                displayReviews(data.reviews);
-            })
-            .catch(error => {
-                console.error("Ошибка загрузки маршрута:", error);
+    const stars = document.querySelectorAll(".star");
+
+    stars.forEach((star, index) => {
+        star.addEventListener("mouseover", () => {
+            // Подсветить все до наведённой включительно
+            stars.forEach((s, i) => {
+                s.classList.toggle("hover", i <= index);
             });
+        });
+
+        star.addEventListener("mouseout", () => {
+            // Убрать подсветку при выходе мышки
+            stars.forEach(s => s.classList.remove("hover"));
+        });
+
+        star.addEventListener("click", () => {
+            const rating = index + 1;
+            document.getElementById("reviewRating").value = rating;
+
+            // Обновить выбранные звёзды
+            stars.forEach((s, i) => {
+                s.classList.toggle("selected", i < rating);
+            });
+        });
     });
 
 
@@ -73,11 +69,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const routeId = document.getElementById("routeId").value;
         const reviewText = document.getElementById("reviewText").value;
+        const rating = parseInt(document.getElementById("reviewRating").value);
+
+        if (!rating || rating < 1 || rating > 5) {
+            alert("Пожалуйста, выберите оценку от 1 до 5 звёзд");
+            return;
+        }
 
         const response = await fetch("/add-review", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ routeId, reviewText })
+            body: JSON.stringify({ routeId, reviewText, rating })
         });
 
         if (response.ok) {

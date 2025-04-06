@@ -149,15 +149,35 @@ app.post('/api/routes/:id/reviews', (req, res) => {
 });
 
 app.post("/add-review", authenticateUser, async (req, res) => {
-    const { routeId, reviewText } = req.body;
+    const { routeId, reviewText, rating } = req.body;
     const userId = req.user.id;
+
+    if (!rating || rating < 1 || rating > 5) {
+        return res.status(400).json({ message: "Некорректный рейтинг" });
+    }
 
     try {
         await pool.query(
-            "INSERT INTO reviews (user_id, route_id, comment) VALUES ($1, $2, $3)",
-            [userId, routeId, reviewText]
+            "INSERT INTO reviews (user_id, route_id, comment, rating) VALUES ($1, $2, $3, $4)",
+            [userId, routeId, reviewText, rating]
         );
         res.json({ message: "Отзыв добавлен" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Ошибка сервера" });
+    }
+});
+
+app.delete("/api/routes/:id", authenticateUser, async (req, res) => {
+    const { id } = req.params;
+
+    if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "Доступ запрещён" });
+    }
+
+    try {
+        await pool.query("DELETE FROM routes WHERE id = $1", [id]);
+        res.json({ message: "Маршрут удалён" });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Ошибка сервера" });

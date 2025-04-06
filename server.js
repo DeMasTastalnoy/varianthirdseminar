@@ -203,8 +203,30 @@ app.get("/home", (req, res) => {
     }
 });
 
+app.get("/routes/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query("SELECT * FROM routes WHERE id = $1", [id]);
+        const route = result.rows[0];
+
+        if (!route) return res.status(404).send("Маршрут не найден");
+
+        res.render("./layouts/routePage", {
+            route: {
+                ...route,
+                coordinates: JSON.stringify(route.coordinates)
+            }
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Ошибка сервера");
+    }
+});
+
 const port = 3000;
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on http://localhost:${port}/home`);
 });

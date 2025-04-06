@@ -32,7 +32,20 @@ nav{
     border: 2px solid black;
     background: white;
     margin: 5px 5px 5px 5px;
-    width: 250px;
+    width: 350px;
     height: auto;
     min-height: 150px;
+}
+
+.friend-card button {
+    padding: 2px 4px;
+    background-color: #4a90e2;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.friend-card button:hover {
+    background-color: #357bd8;
 }

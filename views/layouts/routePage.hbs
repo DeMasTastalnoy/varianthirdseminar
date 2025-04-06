@@ -1,0 +1,47 @@
+<h1>{{route.name}}</h1>
+<p>{{route.description}}</p>
+
+<div id="map" style="height: 400px;"></div>
+
+<script>
+    // Преобразуем JSON-строку координат в массив
+    const coordinates = {{{route.coordinates}}}; // например: [[55.75, 37.57], [55.76, 37.58]]
+</script>
+
+<!-- Яндекс.Карты -->
+<script src="https://api-maps.yandex.ru/2.1/?apikey=447a21a3-0003-4563-87b1-76f9740d806b&lang=ru_RU" type="text/javascript"></script>
+
+<script>
+    ymaps.ready(function () {
+        const center = coordinates[0] || [55.75, 37.57];
+
+        const myMap = new ymaps.Map("map", {
+            center: center,
+            zoom: 10,
+            controls: ['zoomControl', 'fullscreenControl']
+        });
+
+        // Добавляем точки на карту
+        coordinates.forEach(coord => {
+            const placemark = new ymaps.Placemark(coord, {}, {
+                preset: "islands#blueDotIcon"
+            });
+            myMap.geoObjects.add(placemark);
+        });
+
+        // Если есть несколько точек — рисуем маршрут
+        if (coordinates.length > 1) {
+            const routeLine = new ymaps.Polyline(coordinates, {}, {
+                strokeColor: "#0000FF",
+                strokeWidth: 4,
+                strokeOpacity: 0.7
+            });
+            myMap.geoObjects.add(routeLine);
+            myMap.setBounds(routeLine.geometry.getBounds(), {
+                checkZoomRange: true
+            });
+        } else {
+            myMap.setCenter(center, 14);
+        }
+    });
+</script>

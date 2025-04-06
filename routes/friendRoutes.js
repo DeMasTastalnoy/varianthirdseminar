@@ -31,7 +31,7 @@ router.get("/:user_id", async (req, res) => {
                    r.id AS route_id,
                    r.name AS route_name
             FROM users
-                     LEFT JOIN LATERAL jsonb_array_elements_text(users.preferences) AS route(route_id) ON TRUE
+                     LEFT JOIN LATERAL jsonb_array_elements_text(users.preferences -> 'favorites') AS route(route_id) ON TRUE
                 LEFT JOIN routes r ON route.route_id::int = r.id
             WHERE users.id = ANY($1)
         `;

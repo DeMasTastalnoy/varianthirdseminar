@@ -23,6 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         ? `<p>Координаты: ${route.coordinates}</p>`
                         : `<p style="display: none;">Координаты: ${route.coordinates}</p>`;
 
+                    const favoriteButtonHTML = `<button class="add-favorite-btn" data-route-id="${route.id}">В избранное</button>`;
+
                     routeElement.innerHTML = `
                         <h3>${route.name}</h3>
                         <p>${route.description}</p>
@@ -30,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <p style="display:none;">Координаты: ${route.coordinates}</p>
                         <button class="review-btn" data-route-id="${route.id}">Оставить отзыв</button>
                         <button class="viewReviewsBtn" data-route-id="${route.id}">Просмотр отзывов</button>
+                        ${favoriteButtonHTML}
                         ${deleteButtonHTML}
                     `;
                     routesList.appendChild(routeElement);
@@ -56,6 +59,34 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                         } catch (error) {
                             console.error("Ошибка при удалении маршрута:", error);
+                            alert("Ошибка сервера");
+                        }
+                    }
+                });
+
+                document.addEventListener("click", async function (e) {
+                    if (e.target.classList.contains("add-favorite-btn")) {
+                        const routeId = e.target.getAttribute("data-route-id");
+
+                        try {
+                            const response = await fetch("/api/user/preferences", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({ favoriteRouteId: routeId })
+                            });
+
+                            if (response.ok) {
+                                alert("Маршрут добавлен в избранное!");
+                                e.target.disabled = true;
+                                e.target.textContent = "В избранном";
+                            } else {
+                                const err = await response.json();
+                                alert("Ошибка: " + err.message);
+                            }
+                        } catch (err) {
+                            console.error("Ошибка при добавлении в избранное:", err);
                             alert("Ошибка сервера");
                         }
                     }

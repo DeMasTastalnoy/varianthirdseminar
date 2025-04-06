@@ -1,6 +1,107 @@
+<style>
+    .route-card {
+        width: 250px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s ease;
+    }
+
+    .route-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .route-card h4 {
+        margin: 0 0 10px;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .route-card p {
+        flex-grow: 1;
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .route-card button {
+        padding: 8px 12px;
+        background-color: #4a90e2;
+        border: none;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .route-card button:hover {
+        background-color: #357bd8;
+    }
+
+    #favoriteRoutes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+    }
+</style>
+
+
 <h2>Личный кабинет</h2>
 <p>Добро пожаловать, <span id="userName"></span>!</p>
 
 <button id="logout">Выйти</button>
 
+<h3>Избранные маршруты</h3>
+<div id="favoriteRoutes" style="display: flex; flex-wrap: wrap; gap: 15px;"></div>
+
 <script src="/js/auth.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Подставляем имя пользователя
+
+        // Загружаем избранные маршруты
+        fetch("/api/user/preferences")
+                .then(res => res.json())
+                .then(routes => {
+                    const container = document.getElementById("favoriteRoutes");
+                    if (routes.length === 0) {
+                        container.innerHTML = "<p>У вас нет избранных маршрутов.</p>";
+                        return;
+                    }
+
+                    routes.forEach(route => {
+                        const card = document.createElement("div");
+                        card.classList.add("route-card");
+
+                        card.innerHTML = `
+        <div class="route-content">
+            <h4>${route.name}</h4>
+            <p>${route.description}</p>
+            <button class="view-reviews" data-id="${route.id}">Просмотр</button>
+        </div>
+    `;
+
+                        container.appendChild(card);
+                    });
+
+
+                    // Обработка кликов на кнопки "Отзывы"
+                    document.querySelectorAll(".view-reviews").forEach(btn => {
+                        btn.addEventListener("click", () => {
+                            const routeId = btn.getAttribute("data-id");
+                            window.location.href = `/routes/${routeId}`; // или открыть модально, если хочешь
+                        });
+                    });
+                })
+                .catch(err => {
+                    console.error("Ошибка при загрузке избранных маршрутов:", err);
+                });
+    });
+</script>
+
+

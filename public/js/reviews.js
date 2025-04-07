@@ -70,23 +70,36 @@ document.addEventListener("DOMContentLoaded", () => {
         const routeId = document.getElementById("routeId").value;
         const reviewText = document.getElementById("reviewText").value;
         const rating = parseInt(document.getElementById("reviewRating").value);
+        const reviewId = document.getElementById("reviewForm").dataset.reviewId;
 
         if (!rating || rating < 1 || rating > 5) {
             alert("Пожалуйста, выберите оценку от 1 до 5 звёзд");
             return;
         }
 
-        const response = await fetch("/add-review", {
-            method: "POST",
+        const payload = {
+            comment: reviewText,
+            rating
+        };
+
+        const url = reviewId ? `/api/reviews/${reviewId}` : `/api/reviews`;
+        const method = reviewId ? "PUT" : "POST";
+
+        if (!reviewId) payload.route_id = routeId;
+
+        const response = await fetch(url, {
+            method,
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ routeId, reviewText, rating })
+            body: JSON.stringify(payload)
         });
 
         if (response.ok) {
-            alert("Отзыв добавлен!");
+            alert(reviewId ? "Отзыв обновлен!" : "Отзыв добавлен!");
             document.getElementById("reviewForm").style.display = "none";
+            document.getElementById("reviewForm").dataset.reviewId = ""; // Очистим ID
         } else {
-            alert("Ошибка при добавлении отзыва");
+            const err = await response.json();
+            alert(err.error || "Вы уже добавили отзыв, измените или удалите старый");
         }
     });
 

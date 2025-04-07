@@ -78,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             });
 
                             if (response.ok) {
-                                alert("Маршрут добавлен в избранное!");
                                 e.target.disabled = true;
                                 e.target.textContent = "В избранном";
                             } else {
@@ -128,41 +127,77 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 document.querySelectorAll(".viewReviewsBtn").forEach(button => {
                     button.addEventListener("click", function () {
-                        console.log("Получаем отзывы")
                         const routeId = this.getAttribute("data-route-id");
                         const reviewList = document.getElementById("reviewList");
-
                         fetch(`/api/reviews/${routeId}`)
                             .then(response => response.json())
                             .then(reviews => {
-                                reviewList.innerHTML = ""; // Очищаем список
+                                reviewList.innerHTML = "";
                                 if (reviews.length === 0) {
                                     reviewList.innerHTML = "<h2 class='review-header'>Отзывы о маршруте</h2><p>Отзывов пока нет, будьте первым.</p>";
                                 } else {
-                                    const averageRating =
-                                        reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
-
-                                    // Создаём HTML для звёзд
+                                    const averageRating = reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
                                     const starsHTML = getStarsHTML(averageRating);
-
                                     reviewList.innerHTML = `
-                                        <h2 class='review-header'>Отзывы о маршруте</h2>
-                                        <div class="average-rating">
-                                            <span>Рейтинг маршрута</span>
-                                            <span>${starsHTML}</span>
-                                            <span class="rating-number">(${averageRating.toFixed(1)} из 5)</span>
-                                        </div>
-                                    `;
+                        <h2 class='review-header'>Отзывы о маршруте</h2>
+                        <div class="average-rating">
+                            <span>Рейтинг маршрута</span>
+                            <span>${starsHTML}</span>
+                            <span class="rating-number">(${averageRating.toFixed(1)} из 5)</span>
+                        </div>
+                    `;
 
-                                    // Вывод отзывов
+                                    const currentUserId = window.currentUserId;
+                                    const userReview = reviews.find(review => review.user_id === currentUserId);
+
                                     reviews.forEach(review => {
                                         const reviewElement = document.createElement("div");
                                         reviewElement.classList.add("review-card");
                                         reviewElement.innerHTML = `
-                                        <p>${review.comment}</p>
-                                        <p><strong>Оценка:</strong> ${"⭐".repeat(review.rating)}</p>
-                                        <p><strong>Автор:</strong> ${review.name}</p>
-                                        `;
+                            <p>${review.comment}</p>
+                            <p><strong>Оценка:</strong> ${"⭐".repeat(review.rating)}</p>
+                            <p><strong>Автор:</strong> ${review.name}</p>
+                        `;
+
+                                        // Если это отзыв текущего пользователя — добавим кнопки
+                                        if (review.user_id === currentUserId) {
+                                            const editBtn = document.createElement("button");
+                                            editBtn.textContent = "Изменить";
+                                            editBtn.onclick = () => {
+                                                document.getElementById("routeId").value = routeId;
+                                                document.getElementById("reviewRating").value = review.rating;
+                                                document.getElementById("reviewText").value = review.comment;
+                                                document.getElementById("reviewForm").style.display = "block";
+
+                                                // Подсветка звёзд
+                                                const stars = document.querySelectorAll(".star");
+                                                stars.forEach((s, i) => {
+                                                    s.classList.toggle("selected", i < review.rating);
+                                                });
+
+                                                // Сохраняем ID для возможного обновления
+                                                document.getElementById("reviewForm").dataset.reviewId = review.id;
+                                            };
+
+                                            const deleteBtn = document.createElement("button");
+                                            deleteBtn.textContent = "Удалить";
+                                            deleteBtn.onclick = async () => {
+                                                if (confirm("Удалить ваш отзыв?")) {
+                                                    const response = await fetch(`/api/reviews/${review.id}`, {
+                                                        method: "DELETE"
+                                                    });
+                                                    if (response.ok) {
+                                                        alert("Отзыв удален");
+                                                        reviewElement.remove();
+                                                    } else {
+                                                        alert("Ошибка при удалении");
+                                                    }
+                                                }
+                                            };
+
+                                            reviewElement.appendChild(editBtn);
+                                            reviewElement.appendChild(deleteBtn);
+                                        }
                                         reviewList.appendChild(reviewElement);
                                     });
                                 }
